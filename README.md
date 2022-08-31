@@ -1,4 +1,4 @@
-# Tareas SOS
+# Tareas Sistemas Operativos
 Repositorio con las tareas del curso Sistemas Operativos
 
 # Temas
