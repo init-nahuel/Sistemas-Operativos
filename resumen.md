@@ -33,6 +33,8 @@ int pthread_join(pthread_t t, void **pret);
 ```c
 // Tipo
 pthread_mutex_t
+// Macro del tipo
+PTHREAD_MUTEX_INITIALIZER
 
 // Inicializacion
 int pthread_mutex_init(pthread_mutex_t *m, const pthread_mutexattr_t mutexattr);
@@ -68,6 +70,8 @@ Todas estas funciones retornan 0 si se ejecutan correctamente
 ```c
 // Tipo
 pthread_cond_t
+// Macro del tipo
+PTHREAD_COND_INITIALIZER
 
 
 // Inicializacion
