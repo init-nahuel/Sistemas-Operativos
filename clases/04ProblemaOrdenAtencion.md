@@ -1,8 +1,8 @@
 # Problema: Orden de Atencion indefinido
-* Los threads suspendidos con `pthread_mutex_lock` o `pthread_cond_wait` se despiertan en cualquier orden, quedan a criterio de quien los implementan.
-* Primera solucion para atender por orden de llegada: threads sacan un numero cuando se colocan en espera, como los clientes de una farmacia
-* Segunda solucion: cada thread se coloca en epsera en su propia condicion y las condiciones se agregan y extraen de una cola FIFO
-* Ejemplo: Multiples threads comparten un recurso unico que debe ser ocupado en **exclusion mutua**. Para coordinarse, los threads invocan la funcion `ocupar()` para solicitar el recurso e invocan `desocupar()` para liberarlo
+* Los threads suspendidos con `pthread_mutex_lock` o `pthread_cond_wait` se despiertan en cualquier orden, quedan a criterio de quien los implementa.
+* Primera solucion para atender por orden de llegada: threads sacan un numero cuando se colocan en espera, como los clientes de una farmacia.
+* Segunda solucion: cada thread se coloca en espera en su propia condicion y las condiciones se agregan y extraen de una cola FIFO.
+* Ejemplo: Multiples threads comparten un recurso unico que debe ser ocupado en **exclusion mutua**. Para coordinarse, los threads invocan la funcion `ocupar()`, para solicitar el recurso, e invocan `desocupar()` para liberarlo.
   
 ## Atencion en orden no especificado
 Un esquema del codigo a programar en este caso es:
@@ -17,9 +17,9 @@ void desocupar(){
   pthread_mutex_unlock(&m);
 }
 ```
-Los mutex se otorgan en en un orden no especificado.
+Los mutex se otorgan en un orden no especificado.
 
-**OBS:** Las funciones lock y unlock estan hechas de manera que al momento de liberar el mutex, el tiempo transcurrido hasta que se vuelva a ocupar sea de milisegundos.
+**OBS:** Las funciones `lock()` y `unlock()` estan hechas de manera que al momento de liberar el mutex, el tiempo transcurrido hasta que se vuelva a ocupar sea de milisegundos.
 
 Por tanto, una mejor implementacion es:
 ```c
@@ -44,10 +44,10 @@ void desocupar(){
 }
 ```
 
-* Cuando un thread va a esperar bastante tiempo, es mas eficiente que espere con `wait` que con `lock`.
+* Cuando un thread va a esperar bastante tiempo, es mas eficiente que espere con `wait()` que con `lock()`.
 * Las llamadas a `pthread_cond_wait` se despiertan en un orden no especificado.
 
-Al ejecutarse `wait` el thread esperará la condicion, sin embargo esta condicion depende de la variable `busy`, es decir, aun cuando el mutex sea liberado, la variable `busy` es la que condiciona al mutex.
+Al ejecutarse `wait()` el thread esperará la condicion, sin embargo esta condicion depende de la variable `busy`, es decir, aun cuando el mutex sea liberado, la variable `busy` es la que condiciona al mutex.
 
 ---
 ## Ej: Sacar numero como en farmacias
@@ -74,14 +74,14 @@ void desocupar(){
 }
 ```
 
-* Notar que la entrega de numero se realiza dentro de la seccion critica, sino pueden haber casos en que varios threads tengan el mismo numero.
-* En `desocupar` se solicita el mutex para luego aumentar el `display`, despues se despierta a los thread para que continue el proceso cuando se libere el mutex.
+* Notar que la entrega de numeros se realiza dentro de la seccion critica, sino pueden haber casos en que varios threads tengan el mismo numero.
+* En `desocupar()` se solicita el mutex para luego aumentar el `display`, despues se despierta a los thread para que continue el proceso cuando se libere el mutex.
 * Es importante siempre declarar la liberacion del mutex asi como el bloqueo de este, aun cuando el codigo pueda funcionar correctamente.
 ---
 
 ## Lectores/Escritores sin hambruna
 
-* La solucion de la clase pasada presentaba el problama de **hambruna**, dos lectores pueden concertar para entrar alternadamente de manera que siempre haya un lector presente, haciendo esperar al escritor para siempre.
+* La solucion de la clase pasada presentaba el problema de **hambruna**, dos lectores pueden concertar para entrar alternadamente de manera que siempre haya un lector presente, haciendo esperar al escritor para siempre.
 * Una manera de evitar la hambruna es otorgar los permisos de lectura/escritura por orden de llegada.
 
 ---
@@ -141,7 +141,7 @@ Sin embargo, esta solucion posee un problema denominado **Problema de cambio de 
 * Al liberar el recurso se deben despertar los $n$ threads, pero solo uno adquiere el recurso.
 * Se producen $n-1$ **cambios de contexto** inutiles.
 * Para el caso de los lectores/escritores, considere que hay $n$ lectores en espera.
-* Cuadno el escritor sale despierta a los $n$ threads.
+* Cuando el escritor sale, despierta a los $n$ threads.
 * Algunos threads no tendran el siguiente numero y se volveran a dormir.
 * Cuando por fin se despierta el thread con el siguiente numero, vuelve a despertar a todos los lectores.
 * **En el peor caso se producen $O(n^2)$ cambios de contexto inutiles.**
@@ -183,8 +183,8 @@ void desocupar(){
 * Si el recurso no está ocupado, entonces se utiliza y se marca la variable `busy` con 1.
 * En la cola se coloca la direccion de la variable request.
 * Si la cola se encuentra vacia, marcamos `busy` con 0.
-* Al ser una cola de tipo FIFO, cuando se obtienen los elementos de esta, que poseen la condicion de los threads, estos seran atendido en orden de llegada.
-* Ya sea `pthread_cond_signal` o `pthread_cond_broadcast` pueden ser utilizados pues cada thread se rige por el `request`.
+* Al ser una cola de tipo FIFO, cuando se obtienen los elementos de esta, que poseen la condicion de los threads, estos seran atendidos en orden de llegada.
+* Ya sea `pthread_cond_signal()` o `pthread_cond_broadcast()`, pueden ser utilizados pues cada thread se rige por el `request`.
 
 ---
 
