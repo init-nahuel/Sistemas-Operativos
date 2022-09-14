@@ -25,6 +25,7 @@ Para lo que sigue de la materia es necesario incluir la libreria pthreads con `#
 
 
 # Paralelizacion y Mutex
+Herramienta que se utiliza para garantizar la exclusion mutua sobre la seccion critica.
 
 * **Tipo y macro:** Con la macro no es necesario inicializar utilizando el tipo.
  ```c
@@ -50,7 +51,7 @@ Para lo que sigue de la materia es necesario incluir la libreria pthreads con `#
   ```
 
 
-# Funciones utiles para mutex
+# Funciones importantes para mutex
 
 * **Bloquear mutex:** Se utiliza justo antes de entrar a la secion critica, asi se garantiza exclusion mutua.
   ```c
@@ -60,11 +61,11 @@ Para lo que sigue de la materia es necesario incluir la libreria pthreads con `#
   ```c
   int pthread_mutex_unlock(pthread_mutex_t *m);
   ```
+**OBS: La metafora es la de una puerta con llave, asi cuando se llama a `lock()`, la puerta se cierra con llave, mientras que cuando se llama a `unlock()`, la puerta se desbloquea.**
 
 
 # Condiciones
-
-Todas estas funciones retornan 0 si se ejecutan correctamente.
+Una condicion permite esperar eficientemente hasta que ocurra un evento, asi no es necesario usar un ciclo de **Busy Waiting**. (Todas estas funciones retornan 0 si se ejecutan correctamente)
 
 * **Tipo y macro:** Con la macro no es necesario inicializar utilizando el tipo.
  ```c
