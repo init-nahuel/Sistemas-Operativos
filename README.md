@@ -143,7 +143,7 @@ Operaciones:
   
 * **Principio fundamental: Si no hay fichas disponibles, `sem_wait()` espera hasta que otro thread deposite una ficha con `sem_post()`.**
 * Si hay varios threads en espera de una ficha, no se especifica un orden para otorgar las fichas.
-* El uso mas frecuente es para garantizar la exclusion mutua, en tal caso se inicializa con una sola ficha.
-* Tambien se puede usar para suspender un thread hasta que se cumpla una condicion, en tal caso se inicializa con 0 fichas.
+* **El uso mas frecuente es para garantizar la exclusion mutua, en tal caso se inicializa con una sola ficha.**
+* **Tambien se puede usar para suspender un thread hasta que se cumpla una condicion, en tal caso se inicializa con 0 fichas.**
 
 **OBS:** Hay pocos usos en que un semaforo parte con varias fichas.
