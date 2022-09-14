@@ -1,5 +1,5 @@
 # Tareas Sistemas Operativos
-Repositorio con las tareas del curso Sistemas Operativos.
+Repositorio con las tareas y clases del curso Sistemas Operativos.
 
 # Temas
 * Tarea 1: Paralelizacion con threads.
