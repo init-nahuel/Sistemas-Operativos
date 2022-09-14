@@ -89,7 +89,7 @@ PTHREAD_COND_INITIALIZER
   ```c
   int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *m);
   ```
-  * El mutex debe estar cerrado al momento de la invocacion. Esta funcion suspende el thread que la invoca hasta que se invoca `broadcast()` o `signal()`. Por otra parte, cuando se invoca `wait()` se abre el mutex.
+  * **El mutex debe estar cerrado al momento de la invocacion. Esta funcion suspende el thread que la invoca hasta que se invoca `broadcast()` o `signal()`. Por otra parte, cuando se invoca `wait()` se abre el mutex.**
 
 * **Despertar:**
   ```c
@@ -98,7 +98,17 @@ PTHREAD_COND_INITIALIZER
   ```
   * `broadcast()`: Despierta a todos los thread que estan a la espera en la condicion `cond`.
   * `signal()`: Despierta a uno de los thread que esta a la espera en la condicion `cond`.
-  **OBS:** Despertar es relativo, un thread que se despierta todavia tiene que esperar a que se libere el mutex, que esta tomado por el thread que realiza la invocacion de `broadcast()` o `signal()`.
+  
+  **OBS: Despertar es relativo, un thread que se despierta todavia tiene que esperar a que se libere el mutex, que esta tomado por el thread que realiza la invocacion de `broadcast()` o `signal()`.**
+
+
+# Patron de uso de mutex y condiciones
+* Primero se invoca `lock()` para entrar a la seccion critica, garantizando la exclusion mutua, sin embargo probablemente la estructura de datos no se encuentra en el estado para realizar la ejecucion, por tanto debe esperar con `wait()`.
+* Cuando la espera termine, realizar la operacion, para luego despertar a los threads con `broadcast()`.
+* Finalmente liberar el mutex con `unlock()`.
+  
+**OBS: Tanto la condicion de espera como el despertar a los threads pueden ser opcionales dependiento del tipo de problema a resolver.**
+
 
 # Semaforos
 **Un semaforo representa un dispensador de fichas (analogo a semaforo de trenes).**

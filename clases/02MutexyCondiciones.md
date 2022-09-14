@@ -167,7 +167,7 @@ PTHREAD_COND_INITIALIZER
   ```c
   int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *m);
   ```
-  * El mutex debe estar cerrado al momento de la invocacion. Esta funcion suspende el thread que la invoca hasta que se invoca `broadcast()` o `signal()`. Por otra parte, cuando se invoca `wait()` se abre el mutex.
+  * **El mutex debe estar cerrado al momento de la invocacion. Esta funcion suspende el thread que la invoca hasta que se invoca `broadcast()` o `signal()`. Por otra parte, cuando se invoca `wait()` se abre el mutex.**
 
 * **Despertar:**
   ```c
@@ -176,4 +176,6 @@ PTHREAD_COND_INITIALIZER
   ```
   * `broadcast()`: Despierta a todos los thread que estan a la espera en la condicion `cond`.
   * `signal()`: Despierta a uno de los thread que esta a la espera en la condicion `cond`.
-  **OBS:** Despertar es relativo, un thread que se despierta todavia tiene que esperar a que se libere el mutex, que esta tomado por el thread que realiza la invocacion de `broadcast()` o `signal()`.
+
+
+  **OBS: Despertar es relativo, un thread que se despierta todavia tiene que esperar a que se libere el mutex, que esta tomado por el thread que realiza la invocacion de `broadcast()` o `signal()`.**
