@@ -50,13 +50,13 @@ void exitRead(){
 
 Como bien se vió en la anterior clase, la solucion a este problema generaba un numero explosivo de **cambios de contexto**, ya que al despertar, el thread que se despierta es aleatorio por lo que puede que se despierte un thread que no posea el ticket actual que corresponde, despertandose en vano.
 
-La solucion correcta es utilizar un **patro de Request**:
+La solucion correcta es utilizar un **patron de Request**:
 ```c
 typedef struct {
   int ready;
   pthread_cond_t w;
   ...
-} Request
+} Request;
 
 Req req = {0, PTHREAD_COND_INITIALIZER, ...};
 while(!req.ready)
@@ -70,7 +70,7 @@ La solucion es:
 typedef enum {READER, WRITER} Kind; // enumeracion para distinguir entre lector/escritor
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 int readers = 0, writing = 0;
-Queue q; // = makeQueue() // Se inicializa en el main
+Queue *q; // = makeQueue() // Se inicializa en el main
 
 void enterWrite() {
   pthread_mutex_lock(&m);
