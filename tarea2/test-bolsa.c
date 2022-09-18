@@ -17,9 +17,9 @@
 
 // Para probar su tarea por primera vez pruebe con:
 //
-// #define N 100
-// #define NCOMP 1
-// #define NVEND 2
+//#define N 100
+//#define NCOMP 1
+//#define NVEND 2
 //
 // Con estos valores le sera mas facil diagnosticar los errores simples.
 

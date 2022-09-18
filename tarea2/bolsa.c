@@ -15,50 +15,46 @@ pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
 int mejor_precio = 0; // Variable para guardar el mejor precio
 int *status; // Variable para marcar el estado de la posible venta a concretar
-char *nombreComprador;
-char* nombreVendedor;
-
-
+char **nombreComprador;
+char **nombreVendedor;
 
 int vendo(int precio, char *vendedor, char *comprador) {
 
   pthread_mutex_lock(&m);
-  
   int local_status;
-
+  
   if (mejor_precio == 0){ // Caso primer vendedor
     mejor_precio = precio;
-    local_status = 0;
     status = &local_status;
+    local_status = 0;
+
+    nombreVendedor = &vendedor;
+    nombreComprador = &comprador;
   }
   else if (mejor_precio>precio){ // Llega nuevo vendedor con mejor precio, despierta al otro vendedor en espera
     mejor_precio = precio;
     *status = -1;
     local_status = 0;
     status = &local_status;
+
+    nombreVendedor = &vendedor;
+    nombreComprador = &comprador;
+
     pthread_cond_broadcast(&c);
   }
-  else{
-    local_status = -1;
-    status = &local_status; // podria quitarse????????
+  else{ // Caso en que el precio del vendedor es mayor al existente -> retorna FALSE de inmediato
+    pthread_mutex_unlock(&m);
+    return FALSE;
   }
 
-  // compradorCopia = &comprador;
-  while(!*status) pthread_cond_wait(&c, &m);
-  //pthread_mutex_unlock(&m);
+  while(!local_status) pthread_cond_wait(&c, &m);
 
-  if (*status == 1){
-    comprador = nombreComprador; // Copiamos nombre comprador en comprador
-    nombreVendedor = vendedor;
-
+  if (local_status == 1){
     pthread_mutex_unlock(&m);
     return TRUE;
   }
-  // Caso no se vende pues otro vendedor vende mas barato, se cambia local_status a 0 para q el vendedor con precio mas barato espero un comprador
+  // Caso thread en espera es despertado para indicarle que alguien vende mas barato -> retorna FALSE
   else{
-    *status = 0;
-    status = &local_status;
-
     pthread_mutex_unlock(&m);
     return FALSE;
   }
@@ -68,34 +64,28 @@ int vendo(int precio, char *vendedor, char *comprador) {
 
 int compro(char *comprador, char *vendedor) {
 
-  pthread_mutex_lock(&m);
-
   int mejor_precio_local;
+
+  pthread_mutex_lock(&m);
   
   if (status == NULL){ // Caso no hay vendedores
     mejor_precio = 0;
 
     pthread_mutex_unlock(&m);
     return 0;
-  } 
+  }
+  else{ // Hay vendedor en espera
+    *status = 1;
+    status = NULL;
+    
+    pthread_cond_broadcast(&c);
+    strcpy(vendedor, *nombreVendedor);
+    strcpy(*nombreComprador, comprador);
 
-  //strcpy(nombreComprador, comprador);
-  nombreComprador = comprador;
-  *status = 1;
+    mejor_precio_local = mejor_precio;
+    mejor_precio = 0;
+    pthread_mutex_unlock(&m);
 
-  pthread_mutex_unlock(&m);
-  pthread_cond_broadcast(&c);
-
-  //strcpy(vendedor, nombreVendedor);
-
-  vendedor = nombreVendedor;
-  pthread_mutex_lock(&m);
-  
-  status = NULL;
-  mejor_precio_local = mejor_precio;
-  mejor_precio = 0;
-
-  pthread_mutex_unlock(&m);
-
-  return mejor_precio_local;
+    return mejor_precio_local;
+  }
 }
