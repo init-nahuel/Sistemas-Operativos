@@ -1,9 +1,11 @@
-# Tareas Sistemas Operativos
+# Sistemas Operativos
 Repositorio con las tareas y clases del curso Sistemas Operativos.
 
 # Temas
 * Tarea 1: Paralelizacion con threads.
-* Tarea 2: Multiples condiciones.
+* Tarea 2: Sincronizacion.
+* Tarea 3: Multiples Condiciones.
+
 # Introduccion a Paralelizacion
 Para lo que sigue de la materia es necesario incluir la libreria pthreads con `#include <pthread.h>`
 * **Creacion:**
