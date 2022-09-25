@@ -149,3 +149,23 @@ Operaciones:
 * **Tambien se puede usar para suspender un thread hasta que se cumpla una condicion, en tal caso se inicializa con 0 fichas.**
 
 **OBS:** Hay pocos usos en que un semaforo parte con varias fichas.
+
+# Tiempo de espera en condiciones
+
+Para las condiciones existe la operacion:
+
+```c
+pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, struct timespec *abstime);
+```
+* Si no se ha recibido un `signal()` o `broadcast()` dentro de `abstime`, la operacion termina.
+* Ejemplo de uso:
+  
+    ```c
+    int inicio = ...hora actual...;
+    while (!...condicion...) {
+      if (...hora actual...- inicio > tolerancia) break;
+      ...llenar abstime...
+      pthread_cond_timedwait(&cond, &mutex, &abstime);
+    }
+    ```
+**OBS: Esto no se puede implementar con semaforos porque no hay un `sem_timedwait()`.**
