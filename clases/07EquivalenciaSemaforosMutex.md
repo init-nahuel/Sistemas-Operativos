@@ -105,7 +105,7 @@ void cond_signal(Cond *c) {
   
 ## Observaciones
 
-* Como en el nucleo de Linux no hay mutex y condiciones pero si se dispone, podra usar una implementacion similar a esta en la tarea de modulos de Linux para lograr la sincronizacion.
+* Como en el nucleo de Linux no hay mutex y condiciones pero si se dispone de semaforos, podrá usar una implementacion similar a esta en la tarea de modulos de Linux para lograr la sincronizacion.
 * Para las condiciones existe la operacion:
   ```c
   pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, struct timespec *abstime);
