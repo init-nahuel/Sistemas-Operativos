@@ -14,7 +14,7 @@
 
 # Principio de Virtualizacion
 
-* Para asignar eficientemente un recurso limitado, el sistema operativo ,o transforma en multiples recursos virtuales identicos, otorgables a diferentes usuarios.
+* Para asignar eficientemente un recurso limitado, el sistema operativo lo transforma en multiples recursos virtuales identicos, otorgables a diferentes usuarios.
 * Ejemplo 1: El hardware ofrece solo `p` cores, entonces el sistema permite crear multiples cores virtuales denomidados **threads** (o procesos livianos) que comparten la misma memoria.
 * Ejemplo 2: El hardware ofrece una sola memoria, entonces el sistema permite crear multiples procesadores virtuales con su propia memoria, denomidados **procesos Unix o procesos pesados**.
 * Ejemplo 3: El hardware ofrece una sola pantalla, entonces el sistema grafico permite crear multiples pantallas virtuales denominadas ventanas.
@@ -36,7 +36,7 @@ Segun si comparte o no la memoria: **threads** si la comparten, **procesos Unix*
 Segun si el nucleo puede quitarles el core que ocupan o no: a un **proceso preemptive** si se le puede quitar, no a un proceso **non preemptive** (sin adelantamiento).
 
 * Una vez que el nucleo le cede un core a un proceso non preemptive, solo el mismo proceso se lo puede devolver al nucleo.
-* Los primeros sistemas que fueron capaces de cargar simultaneamente multiples aplicaciones solo permitian procesos non preemptive poruqe si se les quitaba el core dejaban de funcionar establemente.
+* Los primeros sistemas que fueron capaces de cargar simultaneamente multiples aplicaciones solo permitian procesos non preemptive porque si se les quitaba el core dejaban de funcionar establemente.
 * La aplicacion debia devolver rapidamente el core para tener un buen **tiempo de respuesta**.
 * Si una aplicacion se quedaba en un ciclo infinito, habia que dar reset.
 
@@ -85,13 +85,14 @@ Segun si el nucleo puede quitarles el core que ocupan o no: a un **proceso preem
   * Asignacion de recursos: memoria asignada, archivos abiertos, espacio de swapping, etc.
   * Contabilizacion de uso de recursos: tiempo de CPU.
 * **Colas de scheduling:** En donde aguardan los descriptores de proceso a la espera de recursos.
-* **Identificado de proceso (pid):** Identificador publico de un proceso, tipicamente un entero entre 0 y 99999.
+* **Identificador de proceso (pid):** Identificador publico de un proceso, tipicamente un entero entre 0 y 99999.
 * **Cambio de contexto:** Cuando el scheduler traspasa un core de un proceso a otro.
   * Es costoso, especialmente entre procesos pesados.
   * **Existen cambios de contexto implicitos y no implicitos**.
-  * Implicitos: El proceso no cedió voluntariamente el core, el nucleo se lo quito, el scheduler los puede evitar.
-  * No implicitos: El proceso cedió voluntariamente el core.
-  * **No confundir los cambios de contexto con las interrupciones.**
+  * **Implicitos**: El proceso no cedió voluntariamente el core, el nucleo se lo quito, el scheduler los puede evitar.
+  * **No implicitos**: El proceso cedió voluntariamente el core.
+  
+     **OBS: No confundir los cambios de contexto con las interrupciones.**
 
 # Ejemplo: nThreads
 
