@@ -115,12 +115,11 @@ Segun si el nucleo puede quitarles el core que ocupan o no: a un **proceso preem
     nThread nextTimeTh; // Next node in a time ordered linked
     void **sp;  // Thread stack pointer when suspended
     void **stack;  // Pointer to the whole stack area
+    // For nThreadExit and nThreadJoin
+    void *retPtr;
+    nThread joinTh;
 
-  // For nThreadExit and nThreadJoin
-  void *retPtr;
-  nThread joinTh;
-
-  int wakeTime;  // For time queues
+    int wakeTime;  // For time queues
   };
   ```
 
