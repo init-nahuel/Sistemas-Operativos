@@ -106,7 +106,7 @@ Segun si el nucleo puede quitarles el core que ocupan o no: a un **proceso preem
   ```c
   typedef struct nthread *nThread;
 
-  struct nthread {
+  struct nThread {
     State status;  // RUN, READY, ZOMBIE, etc.
     char *thread_name;  // Useful for debugging purposes
 
