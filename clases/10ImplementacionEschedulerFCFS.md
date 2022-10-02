@@ -183,22 +183,28 @@ Las funciones y variables globales que son parte de la implementacion empiezan c
     return 0;
   }
   ```
+  * `START_CRITICAL`: Garantiza la **exclusion mutua**.  Creando esta seccion se inhiben las señales (interrupciones enc caso de sistema operativo) y por tanto el timer no le quitará la CPU al thread.
   * En la estructura `nSem` se encuentra un contador de fichas `count` y una cola `queue` con los thread en espera de una ficha.
   * `nSemWait()`: En caso de no existir fichas, ponemos en la cola al thread y lo suspendemos esperando una ficha. En caso contrario le restamos una ficha.
   * `nSemPost()`: En caso de estar vacia la cola de espera de threads por fichas, se deposita una ficha. En caso contrario, obtenemos el thread de la cola y cambiamos su estado a READY.
 
+Tipicamente en las herramientas de sincronizacion se deben aplicar las siguientes funciones en este order:
+  * `setReady(th);`
+  * `suspend(WAIT...);`
+  * `schedule();`
 # Implementacion de secciones criticas: caso single core
 
 **La unica fuente de dataraces son las señales/interrupciones**
 
 * `START_CRITICAL` es una macro de C:
-  * Inhibe las señales/interrupciones.
+  * Inhibe las señales/interrupciones para que el timer no le quite la CPU.
   * `nth_sigsetCritical` include: `SIGALRM`, `SIGVTALRM`, `SIGIO`.
   * Es equivalente a:
   ```c
   sigset_t nth_sigsetOld;
   pthread_sigmask(SIG_BLOCK, &nth_sigsetCritical, nth_sigsetOld);
   ```
+    * Bloquea las señales que se encuentran en `nth_sigsetCritical`.
 
 * `END_CRITICAL` es una macro de C:
   * Permite nuevamente las señales/interrupciones.
@@ -207,5 +213,6 @@ Las funciones y variables globales que son parte de la implementacion empiezan c
   sigset_t nth_sigsetOld;
   pthread_sigmask(SIG_BLOCK, &nth_sigsetCritical, nth_sigsetOld);
   ```
+  * Solo se aceptan las señales que se encuentran en `nth_sigsetCritical`.
   * En un nucleo real se inhiben las interrupciones con una instruccion de maquina como `disable` y se permiten nuevamente con la instruccion `enable`.
   * **Esta prohibido su uso a nivel de usuario.**
