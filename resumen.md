@@ -163,3 +163,82 @@ pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, struct time
     }
     ```
 **OBS: Esto no se puede implementar con semaforos porque no hay un `sem_timedwait()`.**
+
+# nThreads
+
+* El **descriptor de un nanoThread** es:
+
+```c
+typedef struct nthread *nThread;
+
+struct nThread {
+  State status;  // RUN, READY, ZOMBIE, etc.
+  char *thread_name;  // Useful for debugging purposes
+
+  void *queue;  // The queue where this thread is waiting
+  nThread nextTh;  // Next node in a linked list of threads
+  nThread nextTimeTh; // Next node in a time ordered linked
+  void **sp;  // Thread stack pointer when suspended
+  void **stack;  // Pointer to the whole stack area
+  // For nThreadExit and nThreadJoin
+  void *retPtr;
+  nThread joinTh;
+
+  int wakeTime;  // For time queues
+};
+```
+
+* En la implementacion de nThreads, todas las funciones de la API tienen un nombre distinto al del estandar de pthreads.
+
+```c
+#include "nthread.h"
+
+nThread //<===> pthread
+nThreadsCreate //<===> pthread_create
+nLock //<===> pthread_mutex_lock
+```
+
+## Mensajes en nThreads
+
+* **Enviar mensaje:**
+
+  ```c
+  int nSend(nThread th, void *msg);
+  ```
+
+  * Envia un mensaje `msg` al thread `th`. Suspende la ejecucion hasta recibir una respuesta de parte de`th`. Retorna el valor recibido.
+
+* **Recibir mensaje:**
+
+  ```c
+  void *nReceive(nThread *pth, int timeout_ms);
+  ```
+
+  * Suspende la ejecucion hasta recibir un mensaje. Escribe el descriptor del thread que envió el mensaje en `*pth`. REtorna el mensaje recibido. Si `timeout` es mayor a 0, retornará de todas formas luego de esa cantidad de tiempo.
+  
+* **Responder mensaje:**
+
+  ```c
+  void nReply(nThread th, int rc);
+  ```
+
+  * Responde a un mensaje recibido de parte de `th` con el codigo de retorno `rc`. No suspende la ejecucion.
+
+
+
+
+# Cambio de contexto en nThreads: `nKernel/nStack-amd64.s`
+
+```c
+_ChangeToStack(&spOut, &spIn);
+```
+  * Funcion para resguardar los cambios de contexto.
+  * `&spOut`: Puntero del stack saliente.
+  * `&spIn`: Puntero del stack entrante.
+  * Resguarda los registro en la pila del thread saliente con la pila apuntada por `spOut`.
+  * Restaura los registros de la pila del thread entrante, con la pila apuntada por `spIn`.
+
+```c
+_CallInNewStack(&spOut, spNewm fun, ptr);
+```
+* 
