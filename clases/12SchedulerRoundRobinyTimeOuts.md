@@ -23,7 +23,7 @@ int nSleepNanos(long long nanos) {
 # Implementacion de `nth_programTimer()`
 
 ```c
-voidnth_programTimer(longlongnanos, void(*wakeUpFun)(nThreadth)) {
+voidnth_programTimer(long long nanos, void(*wakeUpFun)(nThreadth)) {
   nThreadthisTh= nSelf();
   if(nanos>0) {
     longlongcurrTime= nGetTimeNanos();
@@ -50,7 +50,7 @@ voidnth_programTimer(longlongnanos, void(*wakeUpFun)(nThreadth)) {
 # Runtina de atencion del timer
 
 ```c
-voidnth_RTimerHandler(intsig, siginfo_t*si, void*uc) {
+voidnth_RTimerHandler(int sig, siginfo_t*si, void*uc) {
   START_HANDLER
   nth_wakeThreads();
   nThreadth= nSelf();
@@ -91,7 +91,7 @@ Funcion util en caso de despertar un thread antes del tiempo de espera especific
 * Sirve en operaciones como `pthread_cond_timedwait()`: el thread se activa con `signal()` o `broadcast()`, el thread quedaria todavia con el timer armado. Se cancela invocando `nth_cancelThread()`.
 
 ```c
-void nth_cancelThread(nThreadth) {
+void nth_cancelThread(nThread th) {
   nth_delTimed(nth_timeQueue, th);
   nth_wakeThreads(); // rearm timer if needed
 }
@@ -182,12 +182,12 @@ void nth_rrSchedule(void) {
 # Despertar los cores
 
 ```c
-voidnth_coreWakeUp(intid){
+voidnth_coreWakeUp(int id){
   // senda signaltocoreid towakeitup fromsigsuspend
   pthread_kill(nth_nativeCores[id], SIGUSR1);
 }
 
-voidnth_reviewCores(nThreadth) {
+voidnth_reviewCores(nThread th) {
   if(th==NULL)
     return;
   intncores= nth_totalCores; // look for an idle core
@@ -209,7 +209,7 @@ voidnth_reviewCores(nThreadth) {
 Linux tiene dos tipos de timer, el virtual y el real. El timer virtual es el tiempo que el pthread utilizó la CPU.
 
 ```c
-staticvoidVTimerHandler(intsig, siginfo_t*si, void*uc) {
+staticvoidVTimerHandler(int sig, siginfo_t *si, void *uc) {
   if(nth_coreIsIdle[nth_coreId()])
     return; // prevent schedule recursive
   nThreadth= nSelf();
