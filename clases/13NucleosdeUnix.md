@@ -99,7 +99,7 @@ En assembler: `swap [R1], R2`
     return ret;
   }
   ```
-* Pero está escrita en assembler para usar la instruccion de maquina `swap` y por lo tanto es **atomica**.
+* Pero está escrita en assembler para usar la instruccion de maquina `swap` y por lo tanto es **atomica**. Los `swap` se ejecutan secuelcialmente, por tanto no es posible que otro thread venga al mismo instante y realice la operacion `swap`, tendrá que esperar a que termine la operacion `swap` que habia antes.
 
 # Implementacion **ineficiente** de spin-locks
 
