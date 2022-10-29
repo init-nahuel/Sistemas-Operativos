@@ -12,7 +12,7 @@
   * Es una potencia de 2: 4 KB = $2^{12}$ B
   * Las paginas se enumeran como 0, 1, 2, 3, etc.
   * Sea $S$ el tamaño de la pagina, este será igual a $2^k$.
-  * Comienza en una direccion que es multiplo del tamaño de la pagina: pagina $p$ comienza en direccion $p\cdot S = p<<k$
+  * Comienza en una direccion que es multiplo del tamaño de la pagina: pagina $p$ comienza en direccion $p * S = p<<k$
   * Sea $d$ la direccion de memoria.
   * El tamaño de la pagina es una potencia de 2 para que sea facil obtener el numero de pagina a partir de una direccion $d$ con $shift$:
   
