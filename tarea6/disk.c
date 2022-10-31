@@ -56,11 +56,13 @@ void requestDisk(int track) {
       priPut(bestThanQueue, req, track);
       spinUnlock(&mutex);
       spinLock(&req->sl);
+      spinLock(&mutex);
     }
     else {
       priPut(worseThanQueue, req, track);
       spinUnlock(&mutex);
       spinLock(&req->sl);
+      spinLock(&mutex);
     }
   }
 
@@ -90,7 +92,7 @@ void releaseDisk() {
     spinUnlock(&mutex);
     return;
   }
-  else if (!emptyPriQueue(worseThanQueue)) { // Se sacan todas las request de worseThanQueue para obtener la con peor prioridad y luego agregan a la cola bestThanQueue pues acceden
+  else if (!emptyPriQueue(worseThanQueue)) { // Se sacan todas las request de worseThanQueue para obtener la con peor prioridad y luego se agregan a la cola bestThanQueue pues acceden
                                              // a pista que es mayor a la pista actual
     Request *request;
     do {
@@ -102,13 +104,13 @@ void releaseDisk() {
     spinUnlock(&mutex);
     return;
   }
-  else {
+  else if (emptyPriQueue(worseThanQueue) && emptyPriQueue(bestThanQueue)){
     busy = 0;
     spinUnlock(&mutex);
     return;
   }
 
-  busy = 0;
+  //busy = 0;
   spinUnlock(&mutex);
   return;
 }
