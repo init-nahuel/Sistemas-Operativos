@@ -27,6 +27,7 @@ typedef struct {
 PriQueue *bestThanQueue; // Cola de prioridad con request a pistas mayores que la actual
 PriQueue *worseThanQueue; // Cola de prioridad con request a pistas menores que la actual
 PriQueue *bestThanQueue2; // Cola para mantener las request de paso restates y luego y realizar el traspaso nuevamente
+PriQueue *worseThanQueue2;
 int mutex; // Mutex para asegurar exclusion mutua
 int t; // Variable global con la pista en ejecucion
 int busy; // Variable global para conocer el estado del disco, ocupado o no
@@ -39,6 +40,7 @@ void iniDisk(void) {
   bestThanQueue = makePriQueue();
   bestThanQueue2 = makePriQueue();
   worseThanQueue = makePriQueue();
+  worseThanQueue2 = makePriQueue();
   mutex = OPEN;
   busy = 0;
   t = 0;
@@ -53,19 +55,19 @@ void requestDisk(int track) {
     Request *req = &request;
     
     if (track >= t) {
-      priPut(bestThanQueue, req, track);
+      priPut(bestThanQueue, req, -req->t);
       spinUnlock(&mutex);
       spinLock(&req->sl);
       spinLock(&mutex);
     }
     else {
-      priPut(worseThanQueue, req, track);
+      priPut(worseThanQueue, req, -req->t);
       spinUnlock(&mutex);
       spinLock(&req->sl);
       spinLock(&mutex);
     }
   }
-
+  
   t = track;
   busy = 1;
 
@@ -82,11 +84,11 @@ void releaseDisk() {
     do {
       request = priGet(bestThanQueue);
       if (emptyPriQueue(bestThanQueue)) break;
-      priPut(bestThanQueue2, request, request->t);
+      priPut(bestThanQueue2, request, -request->t);
     } while (!emptyPriQueue(bestThanQueue));
     while(!emptyPriQueue(bestThanQueue2)) {
       Request *req = priGet(bestThanQueue2);
-      priPut(bestThanQueue, req, req->t);
+      priPut(bestThanQueue, req, -req->t);
     }
     spinUnlock(&request->sl);
     spinUnlock(&mutex);
@@ -98,8 +100,12 @@ void releaseDisk() {
     do {
       request = priGet(worseThanQueue);
       if (emptyPriQueue(worseThanQueue)) break;
-      priPut(bestThanQueue, request, request->t);
+      priPut(worseThanQueue2, request, -request->t);
     } while (!emptyPriQueue(worseThanQueue));
+    while(!emptyPriQueue(worseThanQueue2)) {
+      Request *req = priGet(worseThanQueue2);
+      priPut(worseThanQueue, req, -req->t);
+    }
     spinUnlock(&request->sl);
     spinUnlock(&mutex);
     return;
