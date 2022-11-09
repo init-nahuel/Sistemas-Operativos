@@ -19,15 +19,13 @@
 // ...
 typedef struct {
   int t; // Pista de la request
-  int sl; // Spinlock para realizar el busy waiting
+  int *sl; // Spinlock para realizar el busy waiting
 } Request;
 
 // Declare aca las variables globales que necesite
 // ...
 PriQueue *bestThanQueue; // Cola de prioridad con request a pistas mayores que la actual
 PriQueue *worseThanQueue; // Cola de prioridad con request a pistas menores que la actual
-PriQueue *bestThanQueue2; // Cola para mantener las request de paso restates y luego y realizar el traspaso nuevamente
-PriQueue *worseThanQueue2;
 int mutex; // Mutex para asegurar exclusion mutua
 int t; // Variable global con la pista en ejecucion
 int busy; // Variable global para conocer el estado del disco, ocupado o no
@@ -38,9 +36,7 @@ int busy; // Variable global para conocer el estado del disco, ocupado o no
 void iniDisk(void) {
   // ...
   bestThanQueue = makePriQueue();
-  bestThanQueue2 = makePriQueue();
   worseThanQueue = makePriQueue();
-  worseThanQueue2 = makePriQueue();
   mutex = OPEN;
   busy = 0;
   t = 0;
@@ -51,25 +47,27 @@ void requestDisk(int track) {
   spinLock(&mutex);
 
   if (busy) {
-    Request request = {track, CLOSED};
+    int w = CLOSED;
+    Request request = {track, &w};
     Request *req = &request;
     
     if (track >= t) {
-      priPut(bestThanQueue, req, -req->t);
+      priPut(bestThanQueue, req, req->t);
       spinUnlock(&mutex);
-      spinLock(&req->sl);
+      spinLock(&w);
       spinLock(&mutex);
     }
     else {
-      priPut(worseThanQueue, req, -req->t);
+      priPut(worseThanQueue, req, req->t);
       spinUnlock(&mutex);
-      spinLock(&req->sl);
+      spinLock(&w);
       spinLock(&mutex);
     }
   }
-  
-  t = track;
-  busy = 1;
+  else {
+    t = track;
+    busy = 1;
+  }
 
   spinUnlock(&mutex);
   return;
@@ -79,34 +77,24 @@ void releaseDisk() {
   // ...
   spinLock(&mutex);
 
-  if (!emptyPriQueue(bestThanQueue)) { // Se sacan todas las request de bestThanQueue para obtener la con peor prioridad y luego se vuelven a agregar a la misma cola
-    Request *request;
-    do {
-      request = priGet(bestThanQueue);
-      if (emptyPriQueue(bestThanQueue)) break;
-      priPut(bestThanQueue2, request, -request->t);
-    } while (!emptyPriQueue(bestThanQueue));
-    while(!emptyPriQueue(bestThanQueue2)) {
-      Request *req = priGet(bestThanQueue2);
-      priPut(bestThanQueue, req, -req->t);
-    }
-    spinUnlock(&request->sl);
+  if (emptyPriQueue(bestThanQueue)) {
+    PriQueue *copy = worseThanQueue;
+    worseThanQueue = bestThanQueue;
+    bestThanQueue = copy;
+  }
+
+  // Se saca la request con mejor prioridad y se despierta
+  if (!emptyPriQueue(bestThanQueue)) { 
+    Request *request = priGet(bestThanQueue);
+    t = request->t;
+    spinUnlock(request->sl);
     spinUnlock(&mutex);
     return;
   }
-  else if (!emptyPriQueue(worseThanQueue)) { // Se sacan todas las request de worseThanQueue para obtener la con peor prioridad y luego se agregan a la cola bestThanQueue pues acceden
-                                             // a pista que es mayor a la pista actual
-    Request *request;
-    do {
-      request = priGet(worseThanQueue);
-      if (emptyPriQueue(worseThanQueue)) break;
-      priPut(worseThanQueue2, request, -request->t);
-    } while (!emptyPriQueue(worseThanQueue));
-    while(!emptyPriQueue(worseThanQueue2)) {
-      Request *req = priGet(worseThanQueue2);
-      priPut(worseThanQueue, req, -req->t);
-    }
-    spinUnlock(&request->sl);
+  else if (!emptyPriQueue(worseThanQueue)) {
+    Request *request = priGet(worseThanQueue);
+    t = request->t;
+    spinUnlock(request->sl);
     spinUnlock(&mutex);
     return;
   }
@@ -116,7 +104,7 @@ void releaseDisk() {
     return;
   }
 
-  //busy = 0;
+  busy = 0;
   spinUnlock(&mutex);
   return;
 }
