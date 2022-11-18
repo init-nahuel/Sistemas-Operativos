@@ -17,7 +17,7 @@
 
 Cada $\Delta t$ segundos de uso de tiempo de CPU por parte de P, calcular su working set:
 
-Para toda pagina $q\in P$ ($q$ pagina virtual) residente en memoria real:
+Para toda pagina $q\in P$ ( $q$ pagina virtual) residente en memoria real:
 
 ```c
 if (bitR(q) == 1) {
