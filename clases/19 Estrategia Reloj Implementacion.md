@@ -139,9 +139,10 @@ Ver clase 19 pags 6-8
 * Las direcciones virtuales y reales son de 64 bits y por lo tanto las tablas solo pueden almacenas 512 filas.
 * Cada proceso tiene $n$ niveles de tablas de paginas.
 * El primer nivel es el directorio y tiene 512 filas de 64 bits con paginas reales que almacenan tablas de segundo nivel.
-* En el nivel $k$ cada tabla tiene 512 filas de 64 bits con paginas reales que almacenan tablas de nivel $k-1$, con $1<k<n$.
+* En el nivel $k$ cada tabla tiene 512 filas de 64 bits con paginas reales que almacenan tablas de nivel $ k-1 $, con $ 1 < k < n $ .
+  
 * En el nivel $n$ cada tabla tiene 512 filas de 64 bits con las paginas reales atribuidas a un bloque de 2MB del proceso.
 * Amd64 define 4 niveles con direcciones de 48bits (los restantes son 0).
 * Puede direccionar hasta $4KB\cdot  512^4 = 256TB$
-* 
+  
 ![](img/nNiveles64.PNG)
