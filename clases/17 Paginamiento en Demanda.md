@@ -19,7 +19,7 @@
 * En la tabla de paginas de **Q**, en la posicion **w**.
   * Se marca el atributo **V** en 0 para que cuando Q acceda a w gatille un **page fault**.
   * Se rescata el campo pagina real en **r**: es dode se colocará **v**.
-  * Tambien se coloca su atributo `S` (**saved**) en 1 porque hay que distinguir entre paginas grabadas en disco de paginos no atribuidas al proceso `Q` y que deben gatillar la señal SIGSEGV (**segmentation violation**).
+  * Tambien se coloca su atributo `S` (**saved**) en 1 porque hay que distinguir entre paginas grabadas en disco de paginas no atribuidas al proceso `Q` y que deben gatillar la señal SIGSEGV (**segmentation violation**).
 * Se lee la pagia virtual `v` de `P` en la pagina real `r`.
 * En la tabla de paginas de `P`, en la posicion de pagina `v`:
   * Se coloca el atributo de validez `V` de la pagina `v` en 1.
@@ -118,7 +118,7 @@ avanzarCursor();
   * Hay demasiados page faults.
   * Todos los procesos estan en espera del reemplazo de una pagina.
   * Apenas se retoma un proceso, sufre un page fault y vuelve al estado de espera.
-  * La CPU tiene un porcentaje de ocupacion cercao a 0%.
+  * La CPU tiene un porcentaje de ocupacion cercano a 0%.
   * El disco para paginamiento se ocupa al 100%.
   * La unica solucion es que el administrador mate algunos procesos pero el shell de comando de root tampoco avanza.
   * Se produce cuando hay multiples procesos, porque si bien cada proceso exhibe localidad de accesos, cuando el scheduler los ejecuta en tajadas de tiempo, pierden su localidad.
