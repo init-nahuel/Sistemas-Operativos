@@ -50,34 +50,34 @@
 
 * El programador ve las direcciones virtuales, nunca las direcciones reales.
 
-Cada vez que el proceso accede a una direccio virtual `dv` la **memory management unit (MMU)** del procesador traduce `dv` a una direccion real `dr` de esta manera:
+Cada vez que el proceso accede a una direccion virtual `dv` la **memory management unit (MMU)** del procesador traduce `dv` a una direccion real `dr` de esta manera:
     
 ![](img/dvAdr.PNG)
 
 # TLB: Translation Lookaside Buffer
 
 * Cada vez que se realiza un acceso a la memoria hay que realizar un segundo acceso a la tabla de paginas, por lo que es **ineficiente**. Tiene un 100% de sobrecosto en accesos a memoria.
-* La solucio es TLB.
-* La TLB es u cache de traducciones de paginas.
+* La solucion es la TLB.
+* La TLB es una cache de traducciones de paginas.
 * Tamaño: almacena ~1024 traducciones hoy en dia.
 * En cada caso a una pagina `pv`:
   * Si (`pv`, `pr`) está en la TLB, `pr` es su traduccion, por tanto no existe un sobrecosto alguno en tiempo de ejecucion.
   * En caso contrario: Obtener (`pv`, `pr`) de la tabla de paginas en memoria con un sobrecosto de un acceso a memoria adicional, y almacenar (`pv`, `pr`) en la TLB. Como la TLB tiene un tamaño fijo se debe reemplazar este par por algun otro de la TLB.
-  * El ~99% de los accesos a memoria encuentran la traduccio de la pagina en la TLB.
+  * El ~99% de los accesos a memoria encuentran la traduccion de la pagina en la TLB.
 * Los procesadores hoy en dia realizan la busqueda del dato en el cache L1 (nivel/level 1) se hace usando su direccion virtual al mismo tiempo que se busca la direccion en la TLB.
 * Si el dato no está en el cache L1 se busca en el cache L2 usando su direccion real.
 
 # Cambio de contexto
 
 * El hardware de cada core tiene un registro `TP` con la direccion de la tabla de paginas del proceso en ejecucion en ese core.
-* **La direccio de la tabla de paginas de un proceso se almacena en su descriptor de procesos y es ua direccion real. (si no fuese una direccion real, seria una recursio infinita.)**
+* **La direccion de la tabla de paginas de un proceso se almacena en su descriptor de procesos y es una direccion real. (si no fuese una direccion real, seria una recursion infinita.)**
 * En un cambio de contexto de un proceso a otro proceso hay que cambiar el registro `TP` por la tabla de paginas del proceso entrante.
 * Tambien se debe invalidar la TLB.
 * E invalidar el cache L1 porque se consulta usando direcciones virtuales.
 * No es necesario invalidar caches L2 y L3 porque se consultan usando direcciones reales.
 * Invalidar cache L1 es caro en tiempo de ejecucion: varias microsegundos, no tanto invalidar la TLB.
 * **Si el cambio de contexto es a otro thread dentro del mismo proceso, no es necesario ivalidar la TLB o el cache L1 porque se continua en el mismo espacio de direcciones virtuales.**
-* **Por eso a los threads se les llama procesos livianos y a los procesos Unix procesos pesados, porque el cambiomde contexto de los threads es mas rapido.**
+* **Por eso a los threads se les llama procesos livianos y a los procesos Unix procesos pesados, porque el cambio de contexto de los threads es mas rapido.**
 
 # El potencial del paginamiento 
 
