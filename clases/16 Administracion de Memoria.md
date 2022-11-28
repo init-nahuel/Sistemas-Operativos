@@ -116,7 +116,7 @@ Cada vez que el proceso accede a una direccio virtual `dv` la **memory managemen
   * Se agrega el atributo **copy on write (COW)**: Se coloca en 1 en las paginas que tenia $W$ en 1. Asi se genera una copia de estas paginas.
   * Si se escribe en pagina 6 se gatilla un **page fault** y solo entonces el nucleo duplica la pagina, cambiando el atributo **W** a 1.
 
-  ![](img/eficienteFork.PNG)
+![](img/eficienteFork.PNG)
 
   * Esta estrategia privilegia el uso mas habitual de `fork`: el shell de comandos lo usa para lanzar un nuevo proceso ejecutando la secuencia `fork`/`exec`.
   * Entre `fork` y `exec` se modifican muy pocas paginas.
