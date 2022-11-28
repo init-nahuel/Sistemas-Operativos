@@ -28,13 +28,11 @@
 * Ejemplo:
 
   ![](img/ejpaginasvirtuales.PNG)
-
   * Se observa que las paginas reales de los procesos P y Q son disjuntas, por tanto no puede interferir ninguno de los dos con el otro.
   * Para este mapeo se necesita de una estructura de datos que llamaremos **Tabla de Paginas**.
   * Tabla de paginas para proceso P :
 
   ![](img/tablapaginas.PNG)
-
   * El atributo de validez `V` indica si la pagina virtual es valida o no.
   * El atributo de escritura `W` muestra si es posible o no escribir en la pagina.
 
