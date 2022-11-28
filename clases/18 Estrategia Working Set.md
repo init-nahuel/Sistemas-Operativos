@@ -4,13 +4,13 @@
 * Basada en el **calculo del working set** para cada proceso.
 * La principal ventaja es que evita el trashing.
 * Pero agrega un sobrecosto fijo: calcular los working set.
-* Idealmente es mejor usar la estrategia del reloj, pero si sube demasiado la tas ade page faults, cambiar a working set.
+* Idealmente es mejor usar la estrategia del reloj, pero si sube demasiado la tasa de page faults, cambiar a working set.
 * Definicion:
   **El working set de un proceso P en el intervalo de tiempo virtual [t, t'[ es el conjunto de paginas referenciadas por P.**
 * El working set de P se recalcula cada $\Delta t$ segundos para los ultimos **$\Delta t$ segundos de uso de tiempo de CPU** por parte de P.
 * **Estrategia del working set**:
   * Mantener working set de cada proceso en memoria.
-  * En caso de page fault se reemplazan una pagina que no pertenezca al working set de ningun proceso.
+  * En caso de page fault se reemplaza una pagina que no pertenezca al working set de ningun proceso.
   * Si no hay suficiente memoria para la suma de los working set: recurrir a swapping, llevar a disco procesos completos.
 
 ## Implementacion del working set
@@ -44,7 +44,7 @@ for (;;) {
 }
 ```
 
-* Un proceso no puede ejecutarse eficientemente si su working set no cabe en memoria, pero todabia se puede achicar $\Delta t$ para disminuir el tamaño de su working set.
+* Un proceso no puede ejecutarse eficientemente si su working set no cabe en memoria, pero todavia se puede achicar $\Delta t$ para disminuir el tamaño de su working set.
 
 ## Ejemplo de working set
 
