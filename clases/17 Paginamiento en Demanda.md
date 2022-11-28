@@ -3,7 +3,7 @@
 * Se llevan a disco las paginas no usadas recientemente por algun proceso.
 * Se marcan como invalidas pero con un atributo adicional `S` que indica que estan grabadas en disco.
 * El proceso propietario puede continuar ejecutandose.
-* 
+
   ![](img/disco.PNG)
 
 * Si el proceso accede a una pagina en disco, se gatilla un **page fault** y el nucleo carga transparetemente la pagina en memoria nuevamente.
