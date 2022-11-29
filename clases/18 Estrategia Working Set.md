@@ -9,7 +9,7 @@
   **El working set de un proceso P en el intervalo de tiempo virtual [t, t'[ es el conjunto de paginas referenciadas por P.**
 * El working set de P se recalcula cada $\Delta t$ segundos para los ultimos **$\Delta t$ segundos de uso de tiempo de CPU** por parte de P.
 * **Estrategia del working set**:
-  * **Despues del calculo del working en un intervalo los bits R de las paginas virtuales se debe resetear a 0 para calcular el siguiente working set.**
+  * **Despues del calculo del working en un intervalo los bits R de las paginas virtuales se deben resetear a 0 para calcular el siguiente working set.**
   * Mantener working set de cada proceso en memoria.
   * En caso de page fault se reemplaza una pagina que no pertenezca al working set de ningun proceso.
   * Si no hay suficiente memoria para la suma de los working set: recurrir a swapping, llevar a disco procesos completos.
