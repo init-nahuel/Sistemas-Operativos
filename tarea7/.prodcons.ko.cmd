@@ -1,0 +1,1 @@
+cmd_/home/pss/Win/tarea7/prodcons.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T arch/x86/module.lds -o /home/pss/Win/tarea7/prodcons.ko /home/pss/Win/tarea7/prodcons.o /home/pss/Win/tarea7/prodcons.mod.o;  true
