@@ -1,0 +1,1 @@
+cmd_/home/pss/Win/Modules2020-2/Hello/hello.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T arch/x86/module.lds -o /home/pss/Win/Modules2020-2/Hello/hello.ko /home/pss/Win/Modules2020-2/Hello/hello.o /home/pss/Win/Modules2020-2/Hello/hello.mod.o;  true

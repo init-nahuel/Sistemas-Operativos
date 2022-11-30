@@ -1,0 +1,2 @@
+/home/pss/Win/Modules2020-2/Mem/memory.o
+

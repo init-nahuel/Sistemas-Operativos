@@ -1,0 +1,1 @@
+cmd_/home/pss/Win/Modules2020-2/Mem/Module.symvers := sed 's/ko$$/o/' /home/pss/Win/Modules2020-2/Mem/modules.order | scripts/mod/modpost -m    -o /home/pss/Win/Modules2020-2/Mem/Module.symvers -e -i Module.symvers   -T -
