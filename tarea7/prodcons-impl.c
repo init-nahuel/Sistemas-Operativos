@@ -49,13 +49,13 @@ module_exit(prodcons_exit);
 int prodcons_major = 61;     /* Major number */
 
 /* Buffer to store data */
-#define MAX_SIZE 1000
+#define MAX_SIZE 8192
 
-static char *prodcons_buffer; // Driver's Content
-static ssize_t curr_size; // Initially 0, because the buffer is empty
-static int writing; // Writers works with mutual exclusion
-static int readers; // Counter of readers reading the buffer
-static int pend_open_write; // Writers waiting to write when there is already another writer in the driver
+static char *prodcons_buffer; 
+static ssize_t curr_size; 
+static int writing; // variable para indicar si fue leida por una shell
+static int mipos; 
+static int contador;
 
 /* El mutex y la condicion para pipe */
 static KMutex mutex;
@@ -73,8 +73,8 @@ int prodcons_init(void) {
   }
 
   writing = FALSE;
-  readers = 0;
-  pend_open_write = 0;
+  mipos = 0;
+  contador = 0;
   curr_size = 0;
   m_init(&mutex);
   c_init(&cond);
@@ -86,7 +86,7 @@ int prodcons_init(void) {
     return -ENOMEM;
   }
 
-  //memset(prodcons_buffer, 0, MAX_SIZE); // puede no ir?
+  memset(prodcons_buffer, 0, MAX_SIZE); // puede no ir?
   printk("<1>Inserting prodcons module\n");
   return 0;
 }
@@ -105,117 +105,60 @@ void prodcons_exit(void) {
 
 /* No se necesita hacer nada */
 static int prodcons_open(struct inode *inode, struct file *filp) {
-  /*
-  int rc = 0;
-  m_lock(&mutex);
-
-  if (filp->f_mode & FMODE_WRITE) {
-    printk("<1>open request for write\n");
-    pend_open_write++;
-    while (writing || readers>0) {
-      if (c_wait(&cond, &mutex)) {
-        pend_open_write--;
-        c_signal(&cond);
-        rc = -EINTR;
-        goto epilog;
-      }
-    }
-    writing = TRUE;
-    pend_open_write--;
-    curr_size = 0; // Reset the buffer by the new writer
-    c_signal(&cond);
-    printk("<1>open for write succesful\n");
-  }
-  else if (filp->f_mode & FMODE_READ) {
-    // Para evitar hambruna de los escritores, si nadie esta escribiendo
-    // pero hay escritores pendientes (esperan porque readers>0), los
-    // nuevos lectores deben esperar hasta que todos los lectores cierren
-    // el dispositivo e ingrese un nuevo escritor.
-    while (!writing && pend_open_write>0) {
-      if (c_wait(&cond, &mutex)) {
-        rc = -EINTR;
-        goto epilog;
-      }
-    }
-    readers++;
-    printk("<1>open for read\n");
-  }
-
-epilog:
-  m_unlock(&mutex);
-  return rc;
-  */
-  return 0;
+ return 0;
 }
 
 /* No se necesita hacer nada */
 static int prodcons_release(struct inode *inode, struct file *filp) {
-  /*
-  m_lock(&mutex);
-
-  if (filp->f_mode & FMODE_WRITE) {
-    writing = FALSE;
-    c_signal(&cond);
-    printk("<1>close for write succesful\n");
-  }
-  else if (filp->f_mode & FMODE_READ) {
-    readers--;
-    if (readers == 0) {
-      c_signal(&cond);
-    }
-    printk("<1>close for read (readers remaining=%d)\n", readers);
-  }
-
-  m_unlock(&mutex);
-  */
-  return 0;
+ return 0;
 }
 
 static ssize_t prodcons_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
   
   ssize_t rc;
+  
   m_lock(&mutex);
 
-  while (curr_size <= *f_pos && writing) {
-    /*
-    * Si el lector esta en el final del archivo pero hay un proceso
-    * escribiendo en el archivo, el lector espera
-    */
-   if (c_wait(&cond, &mutex)) {
+  while ((curr_size <= *f_pos && writing) || !writing) {
+    /* si el lector esta en el final del archivo pero hay un proceso
+     * escribiendo todavia en el archivo, el lector espera.
+     */
+    printk("waiting\n");
+    if (c_wait(&cond, &mutex)) {
       printk("<1>read interrupted\n");
-      rc = -EINTR;
+      rc= -EINTR;
       goto epilog;
-   }
+    }
+  }
+  writing = FALSE;
+  if (count > curr_size-*f_pos) {
+    count= curr_size-*f_pos;
   }
 
-  if (count > curr_size - *f_pos) {
-    count = curr_size - *f_pos;
-  }
+  printk("<1>read %d bytes at %d\n", (int)contador, (int)*f_pos+mipos);
 
-  printk("<1>read %d bytes at %d\n", (int)count, (int)*f_pos);
-
-  /* Transfiriendo datos hacie el espacio del usuario */
-  if (copy_to_user(buf, prodcons_buffer+*f_pos, count)!=0) {
-    /* El valor de buf es una direccion invalida */
-    rc = -EFAULT;
+  /* Transfiriendo datos hacia el espacio del usuario */
+  if (copy_to_user(buf, prodcons_buffer+mipos+*f_pos, contador)!=0) {
+    /* el valor de buf es una direccion invalida */
+    rc= -EFAULT;
     goto epilog;
   }
 
-  *f_pos += count;
-  rc = count;
+  rc= count;
 
 epilog:
   m_unlock(&mutex);
   return rc;
-  
 }
 
 static ssize_t prodcons_write(struct file *filp, const char *buf, size_t count, loff_t *f_pos){
+  
   ssize_t rc;
   loff_t last;
 
   m_lock(&mutex);
 
+  writing = TRUE;
   last = *f_pos + count;
   if (last > MAX_SIZE) {
     count -= last-MAX_SIZE;
@@ -228,6 +171,8 @@ static ssize_t prodcons_write(struct file *filp, const char *buf, size_t count, 
     goto epilog;
   }
 
+  mipos = *f_pos;
+  contador = count;
   *f_pos += count;
   curr_size = *f_pos;
   rc = count;
