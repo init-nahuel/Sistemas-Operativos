@@ -29,7 +29,6 @@ __used __section("__versions") = {
 	{ 0x6bc3fbc0, "__unregister_chrdev" },
 	{ 0xd1ed3dd3, "kmalloc_caches" },
 	{ 0x6bd0e573, "down_interruptible" },
-	{ 0x56470118, "__warn_printk" },
 	{ 0x110631e3, "__register_chrdev" },
 	{ 0x6b10bee1, "_copy_to_user" },
 	{ 0x5b8239ca, "__x86_return_thunk" },
